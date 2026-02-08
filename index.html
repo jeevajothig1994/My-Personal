@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💝 Valentine's Gift Game 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #6c5b7b 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating hearts animation */
+        .heart-bg {
+            position: fixed;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.3);
+            animation: float 15s infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .subtitle {
+            color: #ffe6f0;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 30px;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            padding: 20px;
+        }
+
+        .gift-box {
+            background: linear-gradient(145deg, #ff8fab, #ff6b9d);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gift-box:hover:not(.opened) {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .gift-box.opened {
+            background: linear-gradient(145deg, #ffd6e0, #ffb3c6);
+            cursor: default;
+        }
+
+        .gift-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: bounce 1s ease infinite;
+        }
+
+        .gift-box.opened .gift-icon {
+            animation: none;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .gift-text {
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .gift-content {
+            display: none;
+            text-align: center;
+        }
+
+        .gift-box.opened .gift-content {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .gift-box.opened .gift-icon.unopened {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .gift-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .gift-message {
+            color: #c2185b;
+            font-weight: bold;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .reset-btn {
+            background: white;
+            color: #ff6b9d;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .celebration {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            text-align: center;
+            animation: popIn 0.5s ease;
+        }
+
+        .celebration.show {
+            display: block;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .celebration h2 {
+            color: #ff6b9d;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .celebration p {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .gift-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            .gift-box {
+                padding: 20px;
+                min-height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating hearts background -->
+    <script>
+        for (let i = 0; i < 15; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-bg';
+            heart.innerHTML = '💕';
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDelay = Math.random() * 15 + 's';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            document.body.appendChild(heart);
+        }
+    </script>
+
+    <div class="container">
+        <h1>💝 Valentine's Gift Game 💝</h1>
+        <p class="subtitle">Click on the hearts to reveal your special Valentine's surprises!</p>
+        
+        <div class="game-info">
+            <span id="gifts-remaining">9 gifts remaining</span> 🎁
+        </div>
+
+        <div class="gift-grid" id="giftGrid">
+            <!-- Gift boxes will be generated by JavaScript -->
+        </div>
+
+        <button class="reset-btn" onclick="resetGame()">🔄 Play Again</button>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="celebration" id="celebration">
+        <h2>🎉 Congratulations! 🎉</h2>
+        <p>You've opened all the Valentine's gifts! 💖</p>
+        <p style="font-size: 3rem; margin: 20px 0;">💕✨💝✨💕</p>
+        <button class="reset-btn" onclick="closeCelebration()">Close</button>
+    </div>
+
+    <script>
+        const gifts = [
+            { emoji: '🌹', message: 'A dozen red roses just for you!' },
+            { emoji: '🍫', message: 'Sweet chocolates to sweeten your day!' },
+            { emoji: '💝', message: 'You make my heart smile!' },
+            { emoji: '🎵', message: 'A romantic playlist of our songs!' },
+            { emoji: '🍰', message: 'Your favorite cake with extra love!' },
+            { emoji: '💕', message: 'You\'re my favorite person in the world!' },
+            { emoji: '🌟', message: 'A romantic stargazing date!' },
+            { emoji: '💌', message: 'A heartfelt love letter just for you!' },
+            { emoji: '🤗', message: 'Unlimited warm hugs and kisses!' }
+        ];
+
+        let openedCount = 0;
+        let shuffledGifts = [];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function initGame() {
+            shuffledGifts = shuffleArray(gifts);
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = '';
+            openedCount = 0;
+            updateCounter();
+
+            shuffledGifts.forEach((gift, index) => {
+                const box = document.createElement('div');
+                box.className = 'gift-box';
+                box.onclick = () => openGift(index);
+                box.innerHTML = `
+                    <div class="gift-icon unopened">💝</div>
+                    <div class="gift-text">Click Me!</div>
+                    <div class="gift-content">
+                        <div class="gift-emoji">${gift.emoji}</div>
+                        <div class="gift-message">${gift.message}</div>
+                    </div>
+                `;
+                grid.appendChild(box);
+            });
+        }
+
+        function openGift(index) {
+            const boxes = document.querySelectorAll('.gift-box');
+            const box = boxes[index];
+            
+            if (box.classList.contains('opened')) return;
+            
+            box.classList.add('opened');
+            openedCount++;
+            updateCounter();
+
+            if (openedCount === shuffledGifts.length) {
+                setTimeout(showCelebration, 500);
+            }
+        }
+
+        function updateCounter() {
+            const remaining = shuffledGifts.length - openedCount;
+            document.getElementById('gifts-remaining').textContent = 
+                remaining === 0 ? 'All gifts opened!' : `${remaining} gift${remaining > 1 ? 's' : ''} remaining`;
+        }
+
+        function showCelebration() {
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('celebration').classList.add('show');
+        }
+
+        function closeCelebration() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('celebration').classList.remove('show');
+        }
+
+        function resetGame() {
+            closeCelebration();
+            initGame();
+        }
+
+        // Initialize game on page load
+        initGame();
+    </script>
+</body>
+</html>
